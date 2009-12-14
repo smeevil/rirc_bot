@@ -1,4 +1,9 @@
 #!/usr/bin/ruby
+require "rubygems"
+require "socket"
+require './lib/setup_wizard.rb'
+require 'highline/import'
+
 Signal.trap("SIGINT") do
   begin
     puts "Stopping..."
@@ -10,9 +15,6 @@ Signal.trap("SIGINT") do
 end
 
 
-require "socket"
-require './lib/setup_wizard.rb'
-require 'highline/import'
 class IRC
   def initialize(options=Hash.new)
     if File.exists?(File.expand_path('config.yml'))
