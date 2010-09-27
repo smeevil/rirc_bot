@@ -3,7 +3,13 @@ require "rubygems"
 require 'fileutils'
 require "socket"
 require './lib/setup_wizard.rb'
-require 'highline/import'
+
+begin
+  require 'highline/import'
+rescue LoadError => e
+  $stderr.puts "You need to install the the highline gem to require 'highline/import'"
+  exit 1
+end
 
 Signal.trap("SIGINT") do
   begin
