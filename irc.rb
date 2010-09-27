@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 require "rubygems"
+require 'fileutils'
 require "socket"
 require './lib/setup_wizard.rb'
 require 'highline/import'
