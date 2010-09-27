@@ -2,6 +2,7 @@
 require "rubygems"
 require 'fileutils'
 require "socket"
+require 'yaml'
 require './lib/setup_wizard.rb'
 
 begin
