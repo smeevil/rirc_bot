@@ -1,14 +1,14 @@
-# rIRC bot
+= rIRC bot
 
 Simple irc bot that will read input from text files and outputs that on irc.
 
-## First-time use:
+== First-time use:
 
   ruby ./irc.rb
 
 This will detect a missing config.yml and guide you through an interactive configuration. After this, it will connect. use ctrl-c to disconnect.
 
-## Daemonize
+== Daemonize
 
   ./daemon (start|stop|restart)
 
