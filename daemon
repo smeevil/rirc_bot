@@ -1,57 +1,19 @@
 #!/usr/bin/ruby
 require 'fileutils'
-@exec="irc.rb"
-@name="Ruby irc bot"
-@match="irc.rb"
-@kill_sig="-9"
-@sleep=5
-
-@pidfile=File.expand_path(File.join(File.dirname(__FILE__), "pid", "#{@exec}.pid"))
-@path=File.expand_path(File.join(File.dirname(__FILE__)))
-FileUtils.mkdir_p(File.dirname(@pidfile))
-
-def start
-  print "starting #{@name}..."
-  STDOUT.flush
-  system("#{@path}/#{@exec} & echo $! > #{@pidfile}")
-  puts " [done]"
+begin
+  require 'rubygems'
+rescue LoadError => e
+  $stderr.puts "Could not load rubygems. Assuming you know what you are doing..."
+end
+begin
+  require 'daemons'
+rescue LoadError => e
+  $stderr.puts "Could not load daemons gem. Please install it."
+  exit 1
 end
 
-def stop
-  if pid_present?
-    print "stopping #{@name}..."
-    STDOUT.flush
-    `kill #{@kill_sig} #{@pid}`
-    sleep @sleep
-    puts " [done]"
-  else
-    puts "#{@name} appears not to be running...(pid not found)"
-  end
-end
+path = File.expand_path(File.join(File.dirname(__FILE__)))
+FileUtils.mkdir_p File.join(path,"log")
 
-def restart
-  stop
-  start
-  puts "#{@name} restarted !"
-end
-
-def pid_present?
-  puts "checking for #{@pidfile}"
-  if File.exists?(@pidfile)
-    @pid=File.read(@pidfile).chomp
-    puts "pid of #{@name} : #{@pid}"
-    @check=`ps #{@pid}`.split("\n").last
-    File.delete(@pidfile)
-    return @check=~/#{@match}/
-  else
-    return false
-  end
-end
-
-case ARGV[0]
-  when "start" then start
-  when "stop" then stop
-  when "restart" then restart
-  else
-    puts "call with start | stop | restart"
-end
+script = File.join(path, "irc.rb")
+Daemons.run(script, :log_output=>true, :dir=>File.join(path, "log"), :app_name=>"rirc_bot", :dir_mode=>:normal)

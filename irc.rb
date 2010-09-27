@@ -1,31 +1,16 @@
 #!/usr/bin/ruby
+$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), "lib"))
 require "rubygems"
 require 'fileutils'
 require "socket"
 require 'yaml'
-require './lib/setup_wizard.rb'
-
-begin
-  require 'highline/import'
-rescue LoadError => e
-  $stderr.puts "You need to install the the highline gem to require 'highline/import'"
-  exit 1
-end
-
-Signal.trap("SIGINT") do
-  begin
-    puts "Stopping..."
-    irc.disconnect
-  rescue
-    puts "could not disconnect"
-  end
-  exit(0)
-end
+require 'rirc_bot/setup_wizard'
 
 class IRC
   def initialize(options=Hash.new)
-    if File.exists?(File.expand_path('config.yml'))
-      config = YAML.load_file(File.expand_path('config.yml'))
+    config_file = options.delete(:config_file) || File.expand_path('config.yml')
+    if File.exists?(config_file)
+      config = YAML.load_file(config_file)
     else
       config=SetupWizard.create
     end
@@ -76,12 +61,30 @@ class IRC
   end
 end
 
-irc=IRC.new
+@irc=IRC.new :config_file=>File.expand_path(File.join(File.dirname(__FILE__), "config.yml"))
 puts "connecting..."
-irc.connect
+@irc.connect
 puts "connected !"
 
-irc.monitor_input while true
-puts "disconnecting..."
-irc.disconnect
-puts "done"
+Signal.trap("SIGINT") do
+  begin
+    puts "Stopping..."
+  rescue => e
+    puts e.inspect
+    puts "could not disconnect"
+  end
+  exit
+end
+Signal.trap("SIGTERM") do
+  begin
+    puts "Stopping..."
+  rescue => e
+    puts e.inspect
+    puts "could not disconnect"
+  end
+  exit
+end
+
+loop do
+  @irc.monitor_input
+end

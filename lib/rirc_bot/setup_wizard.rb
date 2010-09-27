@@ -1,3 +1,10 @@
+begin
+  require 'highline/import'
+rescue LoadError => e
+  $stderr.puts "You need to install the the highline gem to require 'highline/import'"
+  exit 1
+end
+
 class SetupWizard
   def self.create
     config=Hash.new unless config
