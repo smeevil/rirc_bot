@@ -1,0 +1,7 @@
+--- 
+nick: rirc_bot
+port: 6667
+server: irc.freenode.net
+channel: "#rirc_bot"
+password: secret
+monitor_dir: /tmp/to_irc

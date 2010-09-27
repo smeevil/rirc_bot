@@ -15,7 +15,6 @@ Signal.trap("SIGINT") do
   exit(0)
 end
 
-
 class IRC
   def initialize(options=Hash.new)
     if File.exists?(File.expand_path('config.yml'))
@@ -30,7 +29,7 @@ class IRC
     @channel = config['channel']
     @password = config['password']
     @monitor_dir=config['monitor_dir']
-    FileUtils.mkdir(@monitor_dir) unless File.exists?(@monitor_dir)
+    FileUtils.mkdir_p(@monitor_dir)
   end
 
   def send(s)
