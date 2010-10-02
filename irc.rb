@@ -25,10 +25,9 @@ class IRC
   end
 
   def send(s)
-    # s.gsub!("Wes Oldenbeuving","Narnach")
     case s
     when /^(PASS|USER|NICK|JOIN|PING|QUIT)/
-      @irc.send "#{s}\n", 0 
+      @irc.send "#{s}\n", 0
     else
       puts "seding #{s} "
       @irc.send "PRIVMSG #{@channel} : #{s}\n", 0
@@ -44,9 +43,10 @@ class IRC
     send "JOIN #{@channel}"
   end
   def disconnect()
-    @irc.send "QUIT", 0 
+    @irc.send "QUIT", 0
+    @irc=nil
   end
-  
+
   def monitor_input
     files=Dir.glob("#{@monitor_dir}/*.txt")
     files.each do |file|
@@ -86,5 +86,13 @@ Signal.trap("SIGTERM") do
 end
 
 loop do
-  @irc.monitor_input
+  begin
+    connect unless @irc
+    @irc.monitor_input
+  rescue Errno::ECONNRESET => e
+    puts e.inspect
+    connect unless @irc
+    disconnect() rescue nil # just make sure we kill the connection
+    sleep 5
+  end
 end
