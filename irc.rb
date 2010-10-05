@@ -89,7 +89,7 @@ loop do
   begin
     connect unless @irc
     @irc.monitor_input
-  rescue Errno::ECONNRESET => e
+  rescue Errno::ECONNRESET, Errno::EPIPE => e
     puts e.inspect
     connect unless @irc
     disconnect() rescue nil # just make sure we kill the connection
