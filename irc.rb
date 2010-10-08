@@ -34,7 +34,7 @@ class IRC
     end
   end
 
-  def connect()
+  def connect
     # Connect to the IRC server
     @irc = TCPSocket.open(@server, @port)
     send "PASS #{@password}"
@@ -42,9 +42,15 @@ class IRC
     send "NICK #{@nick}"
     send "JOIN #{@channel}"
   end
-  def disconnect()
+
+  def disconnect
     @irc.send "QUIT", 0
     @irc=nil
+  end
+
+  def reconnect
+    disconnect rescue nil
+    connect
   end
 
   def monitor_input
@@ -69,6 +75,7 @@ puts "connected !"
 Signal.trap("SIGINT") do
   begin
     puts "Stopping..."
+    @irc.disconnect
   rescue => e
     puts e.inspect
     puts "could not disconnect"
@@ -78,6 +85,7 @@ end
 Signal.trap("SIGTERM") do
   begin
     puts "Stopping..."
+    @irc.disconnect
   rescue => e
     puts e.inspect
     puts "could not disconnect"
@@ -87,12 +95,11 @@ end
 
 loop do
   begin
-    connect unless @irc
+    @irc.connect unless @irc
     @irc.monitor_input
   rescue Errno::ECONNRESET, Errno::EPIPE => e
-    puts e.inspect
-    connect unless @irc
-    disconnect() rescue nil # just make sure we kill the connection
+    puts "#{e.class.name}: #{e.message}. Re-connection"
+    @irc.reconnect
     sleep 5
   end
 end
