@@ -48,11 +48,6 @@ class IRC
     @irc=nil
   end
 
-  def reconnect
-    disconnect rescue nil
-    connect
-  end
-
   def monitor_input
     files=Dir.glob("#{@monitor_dir}/*.txt")
     files.each do |file|
@@ -97,9 +92,9 @@ loop do
   begin
     @irc.connect unless @irc
     @irc.monitor_input
-  rescue Errno::ECONNRESET, Errno::EPIPE => e
+  rescue SystemCallError => e
     puts "#{e.class.name}: #{e.message}. Re-connection"
-    @irc.reconnect
+    @irc.disconnect rescue nil
     sleep 5
   end
 end
