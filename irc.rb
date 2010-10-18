@@ -42,6 +42,10 @@ class IRC
     send "NICK #{@nick}"
     send "JOIN #{@channel}"
   end
+  
+  def connected?
+    !@irc.nil?
+  end
 
   def disconnect
     @irc.send "QUIT", 0
@@ -90,7 +94,7 @@ end
 
 loop do
   begin
-    @irc.connect unless @irc
+    @irc.connect unless @irc.connected?
     @irc.monitor_input
   rescue SystemCallError => e
     puts "#{e.class.name}: #{e.message}. Re-connection"
